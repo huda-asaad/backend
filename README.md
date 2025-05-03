@@ -36,20 +36,22 @@ It handles user authentication, property listings (villas and apartments), facil
 
 ---
 
+
 ## 🔄 API Routing Table
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET    | `/api/properties/`        | List all properties |
-| GET    | `/api/properties/<id>/`   | View specific property |
-| POST   | `/api/properties/`        | Create property (Admin only) |
-| PUT    | `/api/properties/<id>/`   | Update property (Admin only) |
-| DELETE | `/api/properties/<id>/`   | Delete property (Admin only) |
-| GET    | `/api/inquiries/`         | Admin view of all inquiries |
-| POST   | `/api/inquiries/`         | Submit inquiry (User only) |
-| POST   | `/api/login/`             | User login (JWT) |
-| POST   | `/api/signup/`            | User signup |
-| POST   | `/api/logout/`            | Logout user |
+| Method | Endpoint             | Description                    |
+|--------|----------------------|--------------------------------|
+| GET    | `/properties/`       | List all properties            |
+| GET    | `/properties/<id>/`  | View specific property         |
+| POST   | `/properties/`       | Create property (Admin only)   |
+| PUT    | `/properties/<id>/`  | Update property (Admin only)   |
+| DELETE | `/properties/<id>/`  | Delete property (Admin only)   |
+| GET    | `/inquiries/`        | Admin view of all inquiries    |
+| POST   | `/inquiries/`        | Submit inquiry (User only)     |
+| POST   | `/login/`            | User login (JWT)               |
+| POST   | `/signup/`           | User signup                    |
+| POST   | `/logout/`           | Logout user                    |
+
 
 ---
 
