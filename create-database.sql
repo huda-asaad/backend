@@ -1,0 +1,5 @@
+CREATE DATABASE aqar;
+
+CREATE USER aqar_admin WITH PASSWORD 'password';
+
+GRANT ALL PRIVILEGES ON DATABASE aqar TO aqar_admin;
