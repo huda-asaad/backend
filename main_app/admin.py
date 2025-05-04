@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Property 
+from .models import Property, Amenity, Inquiry
 
-admin.site.register(Property)
+class PropertyAdmin(admin.ModelAdmin):
+    filter_horizontal = ('amenities',)
 
+admin.site.register(Property, PropertyAdmin)
+admin.site.register(Amenity)
+admin.site.register(Inquiry)  

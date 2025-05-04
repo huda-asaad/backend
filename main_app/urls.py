@@ -1,9 +1,14 @@
 from django.urls import path
-from .views import Home, PropertyIndex, PropertyDetailView
-
+from . import views
+from .views import AmenitiesIndex, InquiryCreateView
 
 urlpatterns = [
-    path('', Home.as_view(), name='home'),
-    path('properties/', PropertyIndex.as_view(), name='property-index'),
-    path('properties/<int:property_id>/', PropertyDetailView.as_view(), name='property-detail'),
+    path('', views.Home.as_view(), name='home'),
+    path('properties/', views.PropertyIndex.as_view(), name='property-index'),
+    path('properties/<int:property_id>/', views.PropertyDetailView.as_view(), name='property-detail'),
+    path('properties/<int:property_id>/amenities/', AmenitiesIndex.as_view(), name='amenities-list'),
+    path('properties/<int:property_id>/inquiries/', InquiryCreateView.as_view(), name='create-inquiry'),
+
+
 ]
+

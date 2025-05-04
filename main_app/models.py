@@ -1,8 +1,11 @@
 from django.db import models
 
 
+class Amenity(models.Model):
+    name = models.CharField(max_length=100, unique=True) 
+    def __str__(self):
+        return self.name
 
-    
 
 
 class Property(models.Model):
@@ -18,9 +21,21 @@ class Property(models.Model):
     size = models.PositiveIntegerField(help_text="Size in square meters (م²)")
     rooms = models.PositiveIntegerField()
     bathrooms = models.PositiveIntegerField()
-    image = models.ImageField(upload_to='property_images/', null=True, blank=True)  # ✅ أضف هذا السطر
+    image = models.ImageField(upload_to='property_images/', null=True, blank=True)
+
+    amenities = models.ManyToManyField(Amenity, blank=True)
 
     def __str__(self):
         return f"{self.title} ({self.type})"
 
 
+class Inquiry(models.Model):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='inquiries')
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Inquiry from {self.name} about {self.property.title}"
