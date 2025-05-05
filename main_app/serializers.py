@@ -21,11 +21,12 @@ class UserSerializer(serializers.ModelSerializer):
     
 
 class PropertySerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Property
         fields = '__all__'
         read_only_fields = ['image']
-        
+       
 
 class AmenitySerializer(serializers.ModelSerializer):
     class Meta:

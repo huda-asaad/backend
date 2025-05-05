@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Amenity(models.Model):
@@ -24,6 +25,8 @@ class Property(models.Model):
     image = models.ImageField(upload_to='property_images/', null=True, blank=True)
 
     amenities = models.ManyToManyField(Amenity, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
     def __str__(self):
         return f"{self.title} ({self.type})"

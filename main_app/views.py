@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
@@ -8,6 +7,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Property, Amenity, Inquiry
 from .serializers import  PropertySerializer, AmenitySerializer,   InquirySerializer,  UserSerializer
 from django.contrib.auth import authenticate
+from rest_framework import generics, status, permissions
+from django.db import IntegrityError
+from django.core.exceptions import ValidationError
+
+
 
 class Home(APIView):
     def get(self, request):
@@ -17,25 +21,21 @@ class Home(APIView):
 
 # User Registration
 class CreateUserView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]
-    authentication_classes = []
+  queryset = User.objects.all()
+  serializer_class = UserSerializer
 
-    def create(self, request, *args, **kwargs):
-        print("testing create user")
-        try:
-            response = super().create(request, *args, **kwargs)
-            user = User.objects.get(username=response.data['username'])
-            refresh = RefreshToken.for_user(user)
-            content = {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-                'user': response.data
-            }
-            return Response(content, status=status.HTTP_201_CREATED)
-        except Exception as err:
-            return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+  def create(self, request, *args, **kwargs):
+    try:
+      print(request.data, "checking user data from react")
+      response = super().create(request, *args, **kwargs)
+      user = User.objects.get(username=response.data['username'])
+    #   user.is_staff = True 
+      refresh = RefreshToken.for_user(user)
+      content = {'refresh': str(refresh), 'access': str(refresh.access_token), 'user': response.data }
+      return Response(content, status=status.HTTP_200_OK)
+    except (ValidationError, IntegrityError) as err:
+      return Response({ 'error': str(err)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class LoginView(APIView):
@@ -52,10 +52,27 @@ class LoginView(APIView):
       return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     except Exception as err:
       return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
 
 
-class PropertyIndex(APIView):
+class VerifyUserView(APIView):
+  permission_classes = [permissions.IsAuthenticated]
+
+  def get(self, request):
+    try:
+      user = User.objects.get(username=request.user.username)
+      try:
+        refresh = RefreshToken.for_user(user)
+        return Response({'refresh': str(refresh),'access': str(refresh.access_token),'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
+      except Exception as token_error:
+        return Response({"detail": "Failed to generate token.", "error": str(token_error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as err:
+      print(str(err))
+      return Response({"detail": "Unexpected error occurred.", "error": str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class PropertyIndex(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = PropertySerializer
 
     def get(self, request):
@@ -66,11 +83,11 @@ class PropertyIndex(APIView):
         except Exception as err:
             return Response({'error': str(err)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         try:
-            serializer = self.serializer_class(data=request.data)
+            serializer = self.serializer_class(data=request.data, context={'request': request})
             if serializer.is_valid():
-                serializer.save()
+                serializer.save(user_id=request.user.id)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as err:
@@ -78,6 +95,7 @@ class PropertyIndex(APIView):
 
 
 class PropertyDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = PropertySerializer
 
     def get(self, request, property_id):
@@ -101,7 +119,7 @@ class PropertyDetailView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
-            # print(" Serializer Errors:", serializer.errors)
+
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as err:
@@ -117,6 +135,8 @@ class PropertyDetailView(APIView):
 
 
 class AmenitiesIndex(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = AmenitySerializer
     def get(self, request, property_id):
         try:
             property_instance = Property.objects.get(id=property_id)
@@ -134,13 +154,10 @@ class AmenitiesIndex(APIView):
             if not amenity_name:
                 return Response({'error': 'Amenity name is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # تحقق إن كان فيه amenity بنفس الاسم، أو أنشئ جديد
             amenity, created = Amenity.objects.get_or_create(name=amenity_name)
 
-            # أضف العلاقة إذا لم تكن موجودة
             property_instance.amenities.add(amenity)
 
-            # أرجع القائمة المحدثة
             amenities = property_instance.amenities.all()
             serializer = AmenitySerializer(amenities, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -152,6 +169,7 @@ class AmenitiesIndex(APIView):
         
     
 class InquiryCreateView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = InquirySerializer
 
     def post(self, request, property_id):
