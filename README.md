@@ -11,15 +11,14 @@ It handles user authentication, property listings (villas and apartments), facil
 ---
 
 ## 🌐 Live Site  
-[🌍 Deployed Site - Coming Soon](#)
+[🌍 (http://localhost:5173/)](#)
 
 ---
 
 ## 🧠 Tech Stack
 
-- Python 3
-- Django 5
-- Django REST Framework
+- Python 
+- Django 
 - PostgreSQL
 - JWT Authentication
 - Docker
@@ -29,39 +28,43 @@ It handles user authentication, property listings (villas and apartments), facil
 ## 🧩 Models
 
 - **Property**: Represents a real estate listing (villa or apartment).
-- **Facility**: Facilities related to each property (e.g., pool, garden).
+- **Amenity**: Facilities related to each property (e.g., pool, garden).
 - **Inquiry**: Inquiry submitted by a logged-in user regarding a property.
 
-> 🚫 **User model does not count as one of the 3 required models.**
 
 ---
 
+## 🔄 API Routing Table
 
 ## 🔄 API Routing Table
 
-| Method | Endpoint             | Description                    |
-|--------|----------------------|--------------------------------|
-| GET    | `/properties/`       | List all properties            |
-| GET    | `/properties/<id>/`  | View specific property         |
-| POST   | `/properties/`       | Create property (Admin only)   |
-| PUT    | `/properties/<id>/`  | Update property (Admin only)   |
-| DELETE | `/properties/<id>/`  | Delete property (Admin only)   |
-| GET    | `/inquiries/`        | Admin view of all inquiries    |
-| POST   | `/inquiries/`        | Submit inquiry (User only)     |
-| POST   | `/login/`            | User login (JWT)               |
-| POST   | `/signup/`           | User signup                    |
-| POST   | `/logout/`           | Logout user                    |
+| Method | Endpoint             | Description                              |
+|--------|----------------------|------------------------------------------|
+| GET    | `/properties/`       | List all properties                      |
+| GET    | `/properties/<id>/`  | View specific property                   |
+| POST   | `/properties/<id>/`  | Create property                          |
+| PUT    | `/properties/<id>/`  | Update property                          |
+| DELETE | `/properties/<id>/`  | Delete property                          |
+| GET    | `/inquiries/`        | View all submitted inquiries (admin only)|
+| POST   | `/login/`            | User login (JWT)                         |
+| POST   | `/signup/`           | User signup                              |
+| POST   | `/logout/`           | Logout user                              |
 
+---
+
+## 👩🏻‍💻 IceBox Features
+- Notification system for inquiries
+- Property rating and review system
+
+---
+
+## 📊 ERD Diagram
+
+![ERD Diagram](/real-estate/backend/erd.png)
 
 ---
 
 ## 🛠 Installation Instructions
-
-
-## 📊 ERD Diagram
-
-![ERD](./erd-diagram.png)
-
 
 ```bash
 # Clone the backend repo
